@@ -1,28 +1,18 @@
 import NextAuth from 'next-auth';
 import GoogleProvider from 'next-auth/providers/google';
-import { SupabaseAdapter } from '@next-auth/supabase-adapter';
-import { NextRequest, NextResponse } from 'next/server';
+import { NextAuthOptions } from 'next-auth';
 
-const authOptions = {
+// Configuración de NextAuth
+const authOptions: NextAuthOptions = {
   providers: [
     GoogleProvider({
-      clientId: process.env.GOOGLE_CLIENT_ID!,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+      clientId: process.env.GOOGLE_CLIENT_ID as string,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
     }),
   ],
-  adapter: SupabaseAdapter({
-    url: process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    secret: process.env.SUPABASE_SERVICE_ROLE_KEY!,
-  }),
-  secret: process.env.NEXTAUTH_SECRET!,
+  secret: process.env.NEXTAUTH_SECRET as string,
 };
 
-export async function GET(request: NextRequest) {
-  const res = await NextAuth(request, authOptions);
-  return NextResponse.json(res);
-}
-
-export async function POST(request: NextRequest) {
-  const res = await NextAuth(request, authOptions);
-  return NextResponse.json(res);
-}
+// Exportar el manejador de NextAuth directamente como el manejador de solicitudes para todas las rutas HTTP
+const handler = NextAuth(authOptions);
+export { handler as GET, handler as POST };
