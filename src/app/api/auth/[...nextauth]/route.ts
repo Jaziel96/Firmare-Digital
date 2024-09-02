@@ -11,6 +11,12 @@ const authOptions: NextAuthOptions = {
     }),
   ],
   secret: process.env.NEXTAUTH_SECRET as string,
+  callbacks: {
+    async redirect({ url, baseUrl }) {
+      // Redirige a la página de documentos después del inicio de sesión
+      return `${baseUrl}/documents`;  // Asegúrate de que la ruta coincida con la página de documentos
+    },
+  },
 };
 
 // Exportar el manejador de NextAuth directamente como el manejador de solicitudes para todas las rutas HTTP
