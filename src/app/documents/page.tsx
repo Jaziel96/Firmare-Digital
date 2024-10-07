@@ -1,29 +1,42 @@
 'use client';
 
-import { useEffect } from "react";
-import { useRouter } from "next/navigation";
-import { useSession } from "next-auth/react";
-import { Container, Title, Loader } from "@mantine/core";
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { createClient } from '@supabase/supabase-js';
+import { Container, Title, Loader } from '@mantine/core';
+
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL as string,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY as string
+);
 
 export default function Documents() {
-  const { data: session, status } = useSession();
+  const [session, setSession] = useState<{ user: { email: string | undefined } } | null>(null);
   const router = useRouter();
 
-  // Manejo de redirección si no está autenticado
   useEffect(() => {
-    if (status === "unauthenticated") {
-      router.push("/login");
-    }
-  }, [status, router]);
+    const getSession = async () => {
+      const { data, error } = await supabase.auth.getSession();
+      if (error || !data.session) {
+        router.push('/login');
+      } else {
+        setSession({
+          user: {
+            email: data.session.user.email || 'default@example.com'
+          }
+        });
+      }
+    };
 
-  if (status === "loading") return <Loader />;
-  if (status === "unauthenticated") return <p>Redirecting...</p>;
+    getSession();
+  }, [router]);
+
+  if (!session) return <Loader />;
 
   return (
     <Container>
       <Title order={1}>Documents Page</Title>
-      <p>Welcome, {session?.user?.name}</p>
+      <p>Welcome, {session.user.email}</p>
     </Container>
   );
 }
-
