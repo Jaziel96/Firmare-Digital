@@ -7,7 +7,7 @@ export default function Home() {
   const router = useRouter();
 
   const handleLogin = () => {
-    router.push('/api/auth/signin'); // Redirige a la página de inicio de sesión
+    router.push('/auth'); // Redirige a la página de autenticación
   };
 
   return (
